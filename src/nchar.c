@@ -40,16 +40,15 @@ SEXP FANSI_nzchar(
   SEXP * x_ptr = STRING_PTR(x);
 
   SEXP res = PROTECT(allocVector(LGLSXP, x_len));
+  int* res_ptr = LOGICAL(res);
 
-  for(R_len_t i = 0; i < x_len; ++i, ++x_ptr) {
+  for(R_len_t i = 0; i < x_len; ++i, ++x_ptr, ++res_ptr) {
     FANSI_interrupt(i);
     SEXP string_elt = *x_ptr;
     FANSI_check_enc(string_elt, i);
 
     if(string_elt == R_NaString) {
-      if(keepNA_int == 1) {
-        LOGICAL(res)[i] = NA_LOGICAL;
-      } else LOGICAL(res)[i] = 1;
+      *res_ptr = keepNA_int == 1 ? NA_LOGICAL : 1;
     } else {
       // Don't bother converting to UTF8
 
@@ -79,7 +78,7 @@ SEXP FANSI_nzchar(
       }
       // If string doesn't end at this point, or has ctrl sequences that are not
       // considered control sequences, then there is at least one char
-      LOGICAL(res)[i] = *string != (0 || ctl_not_ctl);
+      *res_ptr = *string != (0 || ctl_not_ctl);
   } }
   UNPROTECT(1);
   return res;

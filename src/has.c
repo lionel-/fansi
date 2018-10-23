@@ -46,7 +46,7 @@ SEXP FANSI_has(SEXP x, SEXP ctl, SEXP warn) {
 
   SEXP * x_ptr = STRING_PTR(x);
 
-  for(R_xlen_t i = 0, i < len; ++i, ++x_ptr) {
+  for(R_xlen_t i = 0; i < len; ++i, ++x_ptr) {
     FANSI_interrupt(i);
     SEXP chrsxp = *x_ptr;
     FANSI_check_enc(chrsxp, i);
