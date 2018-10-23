@@ -67,9 +67,10 @@ SEXP FANSI_strip(SEXP x, SEXP ctl, SEXP warn) {
   // be to keep reallocating to a larger size, maybe by 2x, but then that
   // requires the growing buffer, etc.  For now go simple
 
-  for(i = 0; i < len; ++i) {
+  SEXP * x_ptr = STRING_PTR(x);
+  for(i = 0; i < len; ++i, ++x_ptr) {
     FANSI_interrupt(i);
-    R_len_t chr_len = LENGTH(STRING_ELT(x, i));
+    R_len_t chr_len = LENGTH(*x_ptr);
     if(chr_len > mem_req) mem_req = chr_len;
   }
   // Now strip
@@ -78,9 +79,10 @@ SEXP FANSI_strip(SEXP x, SEXP ctl, SEXP warn) {
   int invalid_idx = 0;
   char * chr_buff;
 
-  for(i = 0; i < len; ++i) {
+  x_ptr = STRING_PTR(x);
+  for(i = 0; i < len; ++i, ++x_ptr) {
     FANSI_interrupt(i);
-    SEXP x_chr = STRING_ELT(x, i);
+    SEXP x_chr = *x_ptr;
     if(x_chr == NA_STRING) continue;
     FANSI_check_enc(x_chr, i);
 
@@ -227,10 +229,12 @@ SEXP FANSI_process(SEXP input, struct FANSI_buff *buff) {
 
   int strip_any = 0;          // Have any elements in the STRSXP been stripped
 
+  SEXP * res_ptr = STRING_PTR(res);
+
   R_xlen_t len = XLENGTH(res);
-  for(R_xlen_t i = 0; i < len; ++i) {
+  for(R_xlen_t i = 0; i < len; ++i, ++res_ptr) {
     FANSI_interrupt(i);
-    SEXP chrsxp = STRING_ELT(res, i);
+    SEXP chrsxp = *res_ptr;
     FANSI_check_enc(chrsxp, i);
     const char * string = CHAR(chrsxp);
     const char * string_start = string;

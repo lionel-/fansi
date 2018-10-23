@@ -357,10 +357,12 @@ SEXP FANSI_esc_to_html(SEXP x, SEXP warn, SEXP term_cap) {
   PROTECT_INDEX ipx;
   PROTECT_WITH_INDEX(res, &ipx);
 
-  for(R_xlen_t i = 0; i < x_len; ++i) {
+  SEXP * x_ptr = STRING_PTR(x);
+
+  for(R_xlen_t i = 0; i < x_len; ++i, ++x_ptr) {
     FANSI_interrupt(i);
 
-    SEXP chrsxp = STRING_ELT(x, i);
+    SEXP chrsxp = *x_ptr;
     FANSI_check_enc(chrsxp, i);
 
     const char * string_start = CHAR(chrsxp);

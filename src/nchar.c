@@ -37,12 +37,13 @@ SEXP FANSI_nzchar(
   int ctl_not_ctl = 0;
 
   R_xlen_t x_len = XLENGTH(x);
+  SEXP * x_ptr = STRING_PTR(x);
 
   SEXP res = PROTECT(allocVector(LGLSXP, x_len));
 
-  for(R_len_t i = 0; i < x_len; ++i) {
+  for(R_len_t i = 0; i < x_len; ++i, ++x_ptr) {
     FANSI_interrupt(i);
-    SEXP string_elt = STRING_ELT(x, i);
+    SEXP string_elt = *x_ptr;
     FANSI_check_enc(string_elt, i);
 
     if(string_elt == R_NaString) {
